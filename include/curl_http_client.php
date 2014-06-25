@@ -527,10 +527,13 @@ class Curl_HTTP_Client
 			curl_setopt ($ch, CURLOPT_COOKIEFILE, COOKIEFILE);
 		}
 		$data = curl_exec($ch);
-		$data = str_replace("\r", "\n", str_replace("\r\n", "\n", $data));
-		list($header, $data) = explode("\n\n", $data, 2);
-		$header .= "\n";
-		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                
+        $info = curl_getinfo($ch);        
+        $header = substr($data,0,$info['header_size']);
+        $data = substr($data,$info['header_size']);
+        $header = str_replace("\r", "\n", str_replace("\r\n", "\n", $header));
+        
+        $http_code = $info['http_code'];
 
 		//echo "*** Got HTTP code: $http_code ***\n";
 		//echo "**  Got headers: \n$header\n\n";
