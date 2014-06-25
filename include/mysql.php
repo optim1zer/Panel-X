@@ -106,8 +106,8 @@ class sql_db {
 	function sql_fetchrow($query_id = 0) {
 		if (!$query_id) $query_id = $this->query_result;
 		if ($query_id) {
-			$this->row[$query_id] = @mysql_fetch_array($query_id);
-			return str_replace("&amp;", "&", $this->row[$query_id]);
+			@$this->row[$query_id] = @mysql_fetch_array($query_id);
+			return @str_replace("&amp;", "&", $this->row[$query_id]);
 		} else {
 			return false;
 		}

@@ -93,12 +93,10 @@ function login() {
 }
 
 if (filesize("writing/ip.txt") == 0 OR !file_exists("writing/ip.txt")) {
-    $content = file_get_contents("http://2ip.ru/");
-    preg_match("/<big>(.*)<\/big>/i", $content, $search);
-    if (strlen($search[1]) > 0) {
-        $fp = fopen("writing/ip.txt", "w");
-        fwrite($fp, $search[1]);
-        fclose($fp);
+    $ipInfo = file_get_contents('http://ipinfo.io/json');
+    $ipInfo = json_decode($ipInfo);
+    if($ipInfo && $ipInfo->ip){
+        file_put_contents("writing/ip.txt", $ipInfo->ip);
     }
 }
 login();

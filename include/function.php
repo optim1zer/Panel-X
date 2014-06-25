@@ -405,10 +405,10 @@ function YandexIndex($url, $stopping = 0) {
         if (($sResp = urlGetContents($urlAddress)) === false) {
             $num = - 1;
         } else {
-            if (strpos($sResp, "http://yandex.ru/checkcaptcha") !== false) {
+            if (strpos($sResp, "http://yandex.ru/captchaimg") !== false) {
 
                 addlog("============ <debug> ============\n");
-                file_put_contents(realpath(dirname(__FILE__).'/../').'writing/captcha_page.html', $sResp);
+                file_put_contents(realpath(dirname(__FILE__).'/../').'/writing/captcha_page.html', $sResp);
                 preg_match('/<input[^>]+?(?:name="key"[^>]+?value="(.*)"|value="(.*)"[^>]+?name="key")>/U', $sResp, $cpmatches);
                 preg_match('/<input[^>]+?(?:name="retpath"[^>]+?value="(.*)"|value="(.*)"[^>]+?name="retpath")>/U', $sResp, $pathmatches);
                 preg_match('/(?:src="(.*)"[^>]+?class="b-captcha__image"|class="b-captcha__image"[^>]+?src="(.*)")/U',$sResp,$imgmatches);
@@ -418,17 +418,17 @@ function YandexIndex($url, $stopping = 0) {
                 fclose($fp);
                 //$key = capchabot("tmp/".$cpmatches[1].".gif");
                 $key = antigate($imgfile, $userconfig['antigate_key']);
-                $formUrl = "http://yandex.ru/checkcaptcha?key=".$cpmatches[1]."&retpath=".$pathmatches[1]."&rep=".$key;
+                $formUrl = "http://yandex.ru/checkcaptcha?key=".$cpmatches[1]."&retpath=".$pathmatches[1]."&rep=".urlencode($key);
                 addlog("\ncpmatches: ".$cpmatches[1]."\npathmatches: ".$pathmatches[1]."\nkey: $key\nResult Url: $formUrl\n\n============ </debug> ============\n\n");
                 $sResp = urlGetContents($formUrl);
                 @unlink($imgfile);
 
             }
 
-            preg_match('~(?:Нашлось|Нашёлся|Нашлась|Нашлись)(?:\s|&nbsp;|<br>|<br />){1,3}(\d+)(?:&nbsp;){1,3}(?:ответ|страниц)~is', $sResp, $a);
+            preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}(?:ответ|страниц)~is', $sResp, $a);
             $num = (int) @$a[1];
             if ($num == 0) {
-                preg_match('~(?:Нашлось|Нашёлся|Нашлась|Нашлись)(?:\s|&nbsp;|<br>|<br />){1,3}(\d+)(?:&nbsp;){1,3}тыс\.(?:&nbsp;){1,3}(?:ответ|страниц)~is', $sResp, $a);
+                preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}тыс\.(?:&nbsp;){1,3}(?:ответ|страниц)~is', $sResp, $a);
                 $num = ((int) @$a[1]) * 1000;
             }
 
@@ -851,10 +851,10 @@ function genPagination($total, $limit, $currentPage, $baseLink, $nextPrev=true) 
     $totalPages = ceil($total / $limit);
 
     //Show only 3 pages before current page(so that we don't have too many pages)
-    $min = ($page - 3 < $totalPages && $currentPage - 3 > 0) ? $currentPage - 3 : 1;
+    $min = ($currentPage - 3 < $totalPages && $currentPage - 3 > 0) ? $currentPage - 3 : 1;
 
     //Show only 3 pages after current page(so that we don't have too many pages)
-    $max = ($page + 3 > $totalPages) ? $totalPages : $currentPage + 3;
+    $max = ($currentPage + 3 > $totalPages) ? $totalPages : $currentPage + 3;
     if ($max > $totalPages)
         $max = $totalPages;
 
@@ -913,18 +913,18 @@ function list_updates() {
 //Проверяем наличие обновлений панели
 function panel_updates() {
     $last = filemtime("panel_update.txt");
-    $now = time();
-    $interval = 86400;
-    if (!$last || (( $now - $last ) > $interval)) {
-        $sResp = urlGetContents("http://moneyseeker.ru/latestpanel.txt");
-        $fp = fopen("writing/panel_update.txt", "w");
-        fwrite($fp, $sResp);
-        fclose($fp);
+    if (!$last || (( time() - $last ) > 86400)) {
+        $sResp = urlGetContents("https://raw.githubusercontent.com/optim1zer/Panel-X/master/writing/panel_update.txt");
+        if($sResp){
+            file_put_contents("writing/panel_update.txt", trim($sResp));
+        }
     }
     $ret = file_get_contents("writing/panel_update.txt");
+    $ret = trim($ret);
     $ip = file_get_contents("writing/ip.txt");
-    if (trim($ret != PANEL_VERSION))
-        $info = "<a href=\"http://bablorub.ru/?type=30\" target=\"_blank\" style=\"color:red;\">Доступно обновление панели</a>"; else
+    if ($ret && $ret != PANEL_VERSION)
+        $info = '<a href="https://github.com/optim1zer/Panel-X" target="_blank" style="color:red;">Доступно обновление панели</a>';
+    else
         $info = "v" . PANEL_VERSION . " (ip: $ip)";
     return($info);
 }
@@ -969,11 +969,12 @@ function main_buttons($panel=1) {
             . "\n\t<a class=\"add\" href='ajax.php?action=add_site_form'\" rel=\"fancybox\"><span>Добавить сайт</span></a>"
             . "\n\t<span id=\"search\"><b id=\"qs\"></b></span>";
     if ($panel != 'sites') {
-        $dirs_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_dirs']));
-        $hosts_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_hosts']));
-        $regs_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_regs']));
-        $cms_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_cms']));
-        $alarms_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_alarms']));
+        $dirs_arr = $hosts_arr = $hosts_arr = $regs_arr = $cms_arr = $alarms_arr = array();
+        $dirs_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_dirs']));
+        $hosts_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_hosts']));
+        $regs_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_regs']));
+        $cms_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_cms']));
+        $alarms_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_alarms']));
         $buttons .= "<ul id=\"nav\">"
                 . "\n\t<li class=\"first\"><a>&nbsp;</a></li>"
                 . "\n\t<li><a href=\"javascript: void(0);\"><img src=\"images/spacer.gif\" class=\"dir\" border=\"0\" alt=\"Папки\">Папки</a>"
@@ -1077,15 +1078,16 @@ function gen_site_rows($userconfig, $sid=0, $pagenum=1, $panel=1) {
         }
     }
     if (strlen($sites_more_query) > 0)
-        $addmore = " LEFT JOIN sites_more AS sm ON(s.id=sm.sid)"; else
+        $addmore = " LEFT JOIN ".$prefix."sites_more AS sm ON(s.id=sm.sid)"; else
         $addmore = "";
     $myfilters = "";
     if ($panel != "sites") {
-        $dirs_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_dirs']));
-        $hosts_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_hosts']));
-        $regs_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_regs']));
-        $cms_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_cms']));
-        $alarms_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_alarms']));
+        $dirs_arr = $hosts_arr = $hosts_arr = $regs_arr = $cms_arr = $alarms_arr = array();
+        $dirs_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_dirs']));
+        $hosts_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_hosts']));
+        $regs_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_regs']));
+        $cms_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_cms']));
+        $alarms_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_alarms']));
         if (count($dirs_arr) > 0) {
             $sites_dir_query = " AND (";
             for ($i = 0; $i < count($dirs_arr); $i++) {
@@ -1129,9 +1131,9 @@ function gen_site_rows($userconfig, $sid=0, $pagenum=1, $panel=1) {
         if (count($alarms_arr) > 0) {
             $sites_alarm_query = " AND (";
             for ($i = 0; $i < count($alarms_arr); $i++) {
+                $adq = "";
                 if (strlen($alarms_arr[$i]) > 0) {
                     list($pr_more, $pr_less, $tcy_more, $tcy_less, $yai_more, $yai_less, $gi_more, $gi_less, $yi_more, $yi_less, $ri_more, $ri_less, $ybl_more, $ybl_less, $alexa_more, $alexa_less, $domain_more, $domain_less) = $db->sql_fetchrow($db->sql_query("SELECT pr_more, pr_less, tcy_more, tcy_less, yai_more, yai_less, gi_more, gi_less, yi_more, yi_less, ri_more, ri_less, ybl_more, ybl_less, alexa_more, alexa_less, domain_more, domain_less FROM " . $prefix . "alarms WHERE id='" . $alarms_arr[$i] . "' LIMIT 1"));
-                    $adq = "";
                     if ($domain_more != - 1)
                         $domain_more = time() + 86400 * $domain_more;
                     if ($domain_less != - 1)
@@ -1174,7 +1176,8 @@ function gen_site_rows($userconfig, $sid=0, $pagenum=1, $panel=1) {
                         $adq .= " AND s.expiry<$domain_less AND s.expiry!='0-00-00'";
                 }
                 if (strlen($adq) > 0)
-                    $sites_alarm_query .= " OR (" . substr($adq, 5) . ")"; else
+                    $sites_alarm_query .= " OR (" . substr($adq, 5) . ")";
+                else
                     $sites_alarm_query .= "";
             }
             if ($sites_alarm_query != " AND (")
@@ -1310,11 +1313,12 @@ function gen_site_rows_csv($userconfig, $panel=1) {
     }
     $myfilters = "";
     if ($panel != "sites") {
-        $dirs_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_dirs']));
-        $hosts_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_hosts']));
-        $regs_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_regs']));
-        $cms_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_cms']));
-        $alarms_arr = explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_alarms']));
+        $dirs_arr = $hosts_arr = $hosts_arr = $regs_arr = $cms_arr = $alarms_arr = array();
+        $dirs_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_dirs']));
+        $hosts_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_hosts']));
+        $regs_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_regs']));
+        $cms_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_cms']));
+        $alarms_arr = @explode(":", preg_replace(array("/^:/", "/:$/"), array("", ""), $_COOKIE['filter_alarms']));
         if (count($dirs_arr) > 0) {
             $sites_dir_query = " AND (";
             for ($i = 0; $i < count($dirs_arr); $i++) {
@@ -1489,8 +1493,8 @@ function gen_site_rows_csv($userconfig, $panel=1) {
 //Обновление информации о сайте
 function site_update($userconfig, $sid, $panel=1, $relcolumn="") {
     global $prefix, $db, $col_titles, $static_cols;
-    $s_row = $db->sql_fetchrow($db->sql_query("SELECT * FROM sites WHERE id='$sid' LIMIT 1"));
-    $h_row = $db->sql_fetchrow($db->sql_query("SELECT * FROM history WHERE sid='$sid' ORDER BY thedate DESC LIMIT 1"));
+    $s_row = $db->sql_fetchrow($db->sql_query("SELECT * FROM ".$prefix."sites WHERE id='$sid' LIMIT 1"));
+    $h_row = $db->sql_fetchrow($db->sql_query("SELECT * FROM ".$prefix."history WHERE sid='$sid' ORDER BY thedate DESC LIMIT 1"));
     $cols = explode(",", $userconfig['tocheck']);
     $url = $s_row['url'];
     $updater = array();

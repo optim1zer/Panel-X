@@ -8,7 +8,7 @@ include_once("include/check_logged.php");
 require_once("include/JsHttpRequest.php");
 if (!extension_loaded('zlib')) ob_start("ob_gzhandler");
 set_time_limit(0);
-$JsHttpRequest = &new JsHttpRequest("utf-8");
+$JsHttpRequest = new JsHttpRequest("utf-8");
 $action = $_REQUEST['action'];
 $userconfig = $db->sql_fetchrow($db->sql_query("SELECT * FROM " . $prefix . "users WHERE login='" . $_COOKIE['ad_login'] . "'"));
 $cols = explode("\n", $userconfig['columns']);
@@ -435,6 +435,7 @@ switch ($action) {
         echo "<table class=\"tablesorter\" id=\"tablesorter\" cellpadding=\"0\" cellspacing=\"0\"><thead><tr>" . $theader[0] . "</tr></thead><tbody id=\"tbodysites\">" . $main_request[0] . "</tbody></table><input type=\"hidden\" id=\"cur_page\" value=\"$pagenum\">";
         $buttons2 = bottom_buttons();
         $pupdate = panel_updates();
+        //$pupdate = 'v'.PANEL_VERSION.' (ip: '.file_get_contents("writing/ip.txt").')';
         $fixer = "<table class=\"tablesorter\" cellpadding=\"0\" cellspacing=\"0\"><thead><tr>" . $theader[1] . "<th style=\"background:#fff;border:0;\"><div><p style=\"width:35px;\"> </p></div></th></tr></thead></table>";
         $GLOBALS['_RESULT'] = array("buttons" => $buttons, "buttons2" => $buttons2, "pages" => $pages, "pupdate" => $pupdate, "fixer" => $fixer);
         break;
@@ -629,7 +630,7 @@ switch ($action) {
                 $mupd .= ", " . str_replace("::", "='", $addstr_arr[$i]) . "'";
             }
             if (strlen($mupd) > 0)
-                $db->sql_query("UPDATE sites_more SET sid='$site_id'$mupd WHERE sid='$site_id'");
+                $db->sql_query("UPDATE " . $prefix . "sites_more SET sid='$site_id'$mupd WHERE sid='$site_id'");
         }
         list($uid) = $db->sql_fetchrow($db->sql_query("SELECT uid FROM " . $prefix . "users WHERE login='" . $_COOKIE['ad_login'] . "'"));
         if ($db->sql_numrows($db->sql_query("SELECT id FROM " . $prefix . "sites WHERE uid='$uid' AND id='$site_id'")) == 0)
