@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>Панель управления сайтами</title>
+	<link rel="stylesheet" type="text/css" href="images/style.css" />
+	<link rel="shortcut icon" href="favicon.ico" />
+	<link rel="icon" type="image/png" href="favicon.png" />
+	<script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery.droppy.js"></script>
+	<script type="text/javascript" src="js/jquery.tablesorter.js"></script>
+	<script type="text/javascript" src="js/jquery.metadata.js"></script>
+	<script type="text/javascript" src="js/jquery.quicksearch.js"></script>
+	<script type="text/javascript" src="js/imgpreview.js"></script>
+        <script type="text/javascript" src="js/swfobject.js"></script>
+	<script type="text/javascript" src="js/JsHttpRequest.js"></script>
+</head>
+<body>
+<div id="head">
+	<div id="menuhead2"><div class="dleft"><div class="dright"><span>
+		$toplinks
+	</span></div></div></div>
+	<div id="topm_icons">
+                <a class='colsettings' href='ajax.php?action=cols_additional' rel="fancybox" title='Настройки дополнительных столбцов'><b>Настройки дополнительных столбцов</b></a>
+		<a class='pansettings' href='ajax.php?action=panel_settings_form' rel="fancybox" title='Настройки вкладки' onmouseover="this.href='ajax.php?action=panel_settings_form&pan='+$('#cur_panel').val();"><b>Настройки вкладки</b></a>
+		<a class='settings' href='ajax.php?action=settings_form' rel="fancybox" title='Настройки'><b>Настройки</b></a>
+		<a class='logout' href='index.php?logout=1' title='Выход'><b>Выход</b></a>
+	</div>
+	<div id="debugger"></div>
+</div>
+<div id="main">
+	<div id="submain">
+		<div id="buttons">
+
+		</div>
+		<div class="clr"></div>
+		<div id="maintable">
+			<table class="tablesorter" id="tablesorter" cellpadding="0" cellspacing="0" style="display: none;">
+				<thead>
+				<tr>
+					<th></th>
+				</tr>
+				</thead>
+				<tbody id="tbodysites">
+                                    <tr />
+				</tbody>
+			</table>
+
+		</div>
+		<div class="maintable" id="fixer"></div>
+		<div class="clr"></div>
+		<div id="buttons2">
+
+		</div>
+		<div style="clear: both;"></div>
+	</div>
+</div>
+<div id="foot">
+	<div id="bmenu">
+
+	</div>
+	<div id="update">
+
+	</div>
+</div>
+<script type="text/javascript" src="js/mypanel.js"></script>
+<script type="text/javascript" src="js/jquery.fancybox.pack.js"></script>
+<script type="text/javascript" src="js/jquery.tablednd_0_5.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {main_load('1');});
+</script>
+<input type="hidden" id="cur_panel" />
+</body>
+</html>
