@@ -2,7 +2,7 @@
 
 include_once("include/curl_http_client.php");
 //Именуем все колонки
-$col_titles = array("pr" => array("PR", "Google PageRank", ""), "tcy" => array("тИЦ", "Тематический индекс цитирования", "http://search.yaca.yandex.ru/yca/cy/ch/[url]/"), "yai" => array("Я.Индекс", "Количество страниц в индексе Яндекса", "http://yandex.ru/yandsearch?text=rhost%3A[yaurl].*%20|%20rhost%3A[yaurl]&lr=225"), "gi" => array("G.Индекс", "Количество страниц в индексе Google", "http://www.google.com/search?hl=en&safe=off&q=site%3A[url]&btnG=Search&aq=f&oq=&aqi="), "yi" => array("Y.Индекс", "Количество страниц в индексе Yahoo!", "http://siteexplorer.search.yahoo.com/advsearch?p=http%3A%2F%2F[url]%2F&bwmo=d&bwmf=s"), "ri" => array("R.Индекс", "Количество страниц в индексе Rambler", "http://nova.rambler.ru/srch?query=&and=1&dlang=0&mimex=0&st_date=&end_date=&news=0&limitcontext=0&exclude=&filter=[url]"), "ybl" => array("Y.Bl", "Беклинки по Yahoo", "http://siteexplorer.search.yahoo.com/advsearch?p=http%3A%2F%2F[url]%2F&bwm=i&bwmo=d&bwmf=s"), "yaca" => array("YaCa", "Наличие в Яндекс.Каталоге", "http://search.yaca.yandex.ru/yca/cy/ch/[url]/"), "dmoz" => array("DMOZ", "Наличие в DMOZ", "http://search.dmoz.org/search/?q=u:[url]"), "alexarank" => array("Alexa", "Alexa Rank", "http://www.alexa.com/siteinfo/http%3A%2F%2F[url]"), "feedcount" => array("FeedBurner", "Количество подписчиков FeedBurner", "http://feedburner.google.com/fb/a/myfeeds"), "li_hits" => array("LI.hit", "Количество хитов за 24 часа LiveInternet", "http://www.liveinternet.ru/stat/[url]/"), "li_hosts" => array("LI.host", "Количество хостов за 24 часа LiveInternet", "http://www.liveinternet.ru/stat/[url]/"), "server" => array("Server", "Ответ сервера", ""), "registration" => array("Created", "Дата регистрации домена", "http://who.is/whois/[url]/"), "expiry" => array("Expiry", "Дата окончания регистрации домена", "http://who.is/whois/[url]/"), "last_check" => array("Проверка", "Дата последней проверки", ""), "dir" => array("Папка", "Папка сайта", ""), "host" => array("Хостинг", "Хостинг сайта", ""), "registrator" => array("Регистратор", "Регистратор домена", ""), "cms" => array("Движок", "CMS сайта", ""), "sape" => array("<a href=\"http://sape.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"sape\" alt=\"Sape\" title=\"Sape\" /></a>", "Наличие сайта в SAPE"), "xap" => array("<a href=\"http://xap.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"xap\" alt=\"XAP\" title=\"XAP\" /></a>", "Наличие сайта в XAP"), "setlinks" => array("<a href=\"http://setlinks.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"sl\" alt=\"SetLinks\" title=\"SetLinks\" /></a>", "Наличие сайта в SetLinks"), "linkfeed" => array("<a href=\"http://linkfeed.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"lf\" alt=\"LinkFeed\" title=\"LinkFeed\" /></a>", "Наличие сайта в LinkFeed"), "mainlink" => array("<a href=\"http://mainlink.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"ml\" alt=\"MainLink\" title=\"MainLink\" /></a>", "Наличие сайта в MainLink"), "uniplace" => array("<a href=\"http://uniplace.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"up\" alt=\"UniPlace\" title=\"UniPlace\" /></a>", "Наличие сайта в UniPlace"), "liex" => array("<a href=\"http://liex.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"lx\" alt=\"Liex\" title=\"Liex\" /></a>", "Наличие сайта в Liex"), "seozavr" => array("<a href=\"http://seozavr.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"sz\" alt=\"SeoZavr\" title=\"SeoZavr\" /></a>", "Наличие сайта в SeoZavr"), "adsense" => array("<a href=\"https://www.google.com/adsense/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"as\" alt=\"AdSense\" title=\"AdSense\" /></a>", "Сайт работает с Google AdSense"), "direct" => array("<a href=\"http://direct.yandex.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"yd\" alt=\"Я.Директ\" title=\"Я.Директ\" /></a>", "Сайт работает с Яндекс.Директ"), "begun" => array("<a href=\"http://my.begun.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"bg\" alt=\"Begun\" title=\"Begun\" /></a>", "Сайт работает с Begun"), "miralinks" => array("<a href=\"http://miralinks.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"mr\" alt=\"MiraLinks\" title=\"MiraLinks\" /></a>", "Сайт работает с MiraLinks"), "be2me" => array("<a href=\"http://be2me.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"bm\" alt=\"Be2Me\" title=\"Be2Me\" /></a>", "Сайт работает с Be2Me"), "ip" => array("IP", "IP-адрес сайта", "http://who.is/whois-ip/ip-address/[ip]/"), "comment" => array("Коммент.", "Ваш текстовый комментарий к сайту"), "age" => array("Возраст", "Возраст домена"));
+$col_titles = array("pr" => array("PR", "Google PageRank", ""), "tcy" => array("тИЦ", "Тематический индекс цитирования", "http://yaca.yandex.ru/yca?yaca=1&text=[url]"), "yai" => array("Я.Индекс", "Количество страниц в индексе Яндекса", "http://yandex.ru/yandsearch?text=rhost%3A[yaurl].*%20|%20rhost%3A[yaurl]&lr=225"), "gi" => array("G.Индекс", "Количество страниц в индексе Google", "http://www.google.com/search?hl=en&safe=off&q=site%3A[url]&btnG=Search&aq=f&oq=&aqi="), "yi" => array("Y.Индекс", "Количество страниц в индексе Yahoo!", "http://siteexplorer.search.yahoo.com/advsearch?p=http%3A%2F%2F[url]%2F&bwmo=d&bwmf=s"), "ri" => array("R.Индекс", "Количество страниц в индексе Rambler", "http://nova.rambler.ru/srch?query=&and=1&dlang=0&mimex=0&st_date=&end_date=&news=0&limitcontext=0&exclude=&filter=[url]"), "ybl" => array("Y.Bl", "Беклинки по Yahoo", "http://siteexplorer.search.yahoo.com/advsearch?p=http%3A%2F%2F[url]%2F&bwm=i&bwmo=d&bwmf=s"), "yaca" => array("YaCa", "Наличие в Яндекс.Каталоге", "http://yaca.yandex.ru/yca?yaca=1&text=[url]"), "dmoz" => array("DMOZ", "Наличие в DMOZ", "http://search.dmoz.org/search/?q=u:[url]"), "alexarank" => array("Alexa", "Alexa Rank", "http://www.alexa.com/siteinfo/http%3A%2F%2F[url]"), "feedcount" => array("FeedBurner", "Количество подписчиков FeedBurner", "http://feedburner.google.com/fb/a/myfeeds"), "li_hits" => array("LI.hit", "Количество хитов за 24 часа LiveInternet", "http://www.liveinternet.ru/stat/[url]/"), "li_hosts" => array("LI.host", "Количество хостов за 24 часа LiveInternet", "http://www.liveinternet.ru/stat/[url]/"), "server" => array("Server", "Ответ сервера", ""), "registration" => array("Created", "Дата регистрации домена", "http://who.is/whois/[url]/"), "expiry" => array("Expiry", "Дата окончания регистрации домена", "http://who.is/whois/[url]/"), "last_check" => array("Проверка", "Дата последней проверки", ""), "dir" => array("Папка", "Папка сайта", ""), "host" => array("Хостинг", "Хостинг сайта", ""), "registrator" => array("Регистратор", "Регистратор домена", ""), "cms" => array("Движок", "CMS сайта", ""), "sape" => array("<a href=\"http://sape.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"sape\" alt=\"Sape\" title=\"Sape\" /></a>", "Наличие сайта в SAPE"), "xap" => array("<a href=\"http://xap.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"xap\" alt=\"XAP\" title=\"XAP\" /></a>", "Наличие сайта в XAP"), "setlinks" => array("<a href=\"http://setlinks.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"sl\" alt=\"SetLinks\" title=\"SetLinks\" /></a>", "Наличие сайта в SetLinks"), "linkfeed" => array("<a href=\"http://linkfeed.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"lf\" alt=\"LinkFeed\" title=\"LinkFeed\" /></a>", "Наличие сайта в LinkFeed"), "mainlink" => array("<a href=\"http://mainlink.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"ml\" alt=\"MainLink\" title=\"MainLink\" /></a>", "Наличие сайта в MainLink"), "uniplace" => array("<a href=\"http://uniplace.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"up\" alt=\"UniPlace\" title=\"UniPlace\" /></a>", "Наличие сайта в UniPlace"), "liex" => array("<a href=\"http://liex.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"lx\" alt=\"Liex\" title=\"Liex\" /></a>", "Наличие сайта в Liex"), "seozavr" => array("<a href=\"http://seozavr.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"sz\" alt=\"SeoZavr\" title=\"SeoZavr\" /></a>", "Наличие сайта в SeoZavr"), "adsense" => array("<a href=\"https://www.google.com/adsense/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"as\" alt=\"AdSense\" title=\"AdSense\" /></a>", "Сайт работает с Google AdSense"), "direct" => array("<a href=\"http://direct.yandex.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"yd\" alt=\"Я.Директ\" title=\"Я.Директ\" /></a>", "Сайт работает с Яндекс.Директ"), "begun" => array("<a href=\"http://my.begun.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"bg\" alt=\"Begun\" title=\"Begun\" /></a>", "Сайт работает с Begun"), "miralinks" => array("<a href=\"http://miralinks.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"mr\" alt=\"MiraLinks\" title=\"MiraLinks\" /></a>", "Сайт работает с MiraLinks"), "be2me" => array("<a href=\"http://be2me.ru/\" target=\"blank\"><img src=\"images/spacer.gif\" class=\"bm\" alt=\"Be2Me\" title=\"Be2Me\" /></a>", "Сайт работает с Be2Me"), "ip" => array("IP", "IP-адрес сайта", "http://who.is/whois-ip/ip-address/[ip]/"), "comment" => array("Коммент.", "Ваш текстовый комментарий к сайту"), "age" => array("Возраст", "Возраст домена"));
 //Перечисляем колонки без статистики
 $static_cols = array("dir", "cms", "host", "registrator", "last_check", "sape", "xap", "setlinks", "linkfeed", "mainlink", "uniplace", "liex", "seozavr", "adsense", "direct", "begun", "miralinks", "be2me", "server", "registration", "expiry", "dmoz", "yaca", "ip", "comment", "age");
 //Колонки, которые нельзя обновить
@@ -629,7 +629,7 @@ function serverStat($url) {
 //Проверка DMOZ
 function getDMOZ($url) {
     $buf = urlGetContents('http://search.dmoz.org/search/?q=u:' . $url);
-    if (preg_match('!Open Directory Sites!ism', $buf)) {
+    if (preg_match('!DMOZ Sites!ism', $buf)) {
         return (1);
     } else {
         return (0);
@@ -638,12 +638,12 @@ function getDMOZ($url) {
 
 //Проверка Я.Каталог
 function getYACA($site) {
-    $buf = urlGetContents('http://search.yaca.yandex.ru/yca/cy/ch/' . $site . '/', 80, 15);
+    $buf = urlGetContents('http://yaca.yandex.ru/yca?yaca=1&text='.$site, 80, 15);
     // нигде не встречается
-    if (!preg_match('!не описан!ism', $buf)) {
-        return(1);
+    if (preg_match('!<div class="z-counter">[^<]*?[1-9]+?[^<]*?</div>!is', $buf)) {
+        return true;
     } else {
-        return(0);
+        return false;
     }
 }
 
@@ -895,24 +895,26 @@ function printrfile($var) {
 //Проверяем файл с данными об апдейтах PR, ЯВ, тИЦ и парсим pr-cy
 function list_updates() {
     $last = filemtime("writing/updates.txt");
-    $now = time();
-    $interval = 43200;
-    if (!$last || (( $now - $last ) > $interval)) {
-        $sResp = urlGetContents("http://pr-cy.ru/updates");
-        $sResp = str_replace("\n", "", str_replace(" ", "", str_replace("\t", "", $sResp)));
-        preg_match('/<tr><tdvalign="top">(\d+).(\d+).(\d+)<br\/>(.*)<\/td><tdvalign="top">(\d+).(\d+).(\d+)<br\/>(.*)<divid="cy">(.*)<\/td><tdvalign="top">(\d+).(\d+).(\d+)<br\/>(.*)<divid="se">/', $sResp, $a); //PR
-        $content = "<b style=\"color:#646464;\">PR</b>: <span class=\"count\">" . $a[1] . "." . $a[2] . "." . $a[3] . "</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b style=\"color:#646464;\">тИЦ</b>: <span class=\"count\">" . $a[5] . "." . $a[6] . "." . $a[7] . "</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b style=\"color:#646464;\">ЯВ</b>: <span class=\"count\">" . $a[10] . "." . $a[11] . "." . $a[12] . "</span>";
-        $fp = fopen("writing/updates.txt", "w");
-        fwrite($fp, $content);
-        fclose($fp);
+    if (!$last || (( time() - $last ) > 86400)) {
+        $upCY = $upPR = $upYAV = '&mdash;';
+        $sResp = file_get_contents("http://pr-cy.ru/updates.xml");
+        if($updates = new SimpleXMLElement($sResp)){
+            $upCY = $updates->cy;
+            $upPR = $updates->pr;
+            $upYAV = $updates->yav;
+        }
+        $content = '<b style="color:#646464;">PR</b>: <span class="count">'.$upPR.'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.
+                  '<b style="color:#646464;">тИЦ</b>: <span class="count">'.$upCY.'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.
+                  '<b style="color:#646464;">ЯВ</b>: <span class="count">'.$upYAV.'</span>';
+        file_put_contents("writing/updates.txt", $content);
+        return $content;
     }
-    $ret = file_get_contents("writing/updates.txt");
-    return($ret);
+    return file_get_contents("writing/updates.txt");
 }
 
 //Проверяем наличие обновлений панели
 function panel_updates() {
-    $last = filemtime("panel_update.txt");
+    $last = filemtime("writing/panel_update.txt");
     if (!$last || (( time() - $last ) > 86400)) {
         $sResp = urlGetContents("https://raw.githubusercontent.com/optim1zer/Panel-X/master/writing/panel_update.txt");
         if($sResp){
