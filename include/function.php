@@ -77,7 +77,7 @@ function urlGetContents($url, $port = 80, $timeout = 40, $getcode = 0) {
 }
 
 //Работа с антигейтом
-function antigate($filename, $apikey, $is_verbose = true, $rtimeout = 5, $mtimeout = 120, $is_phrase = 0, $is_regsense = 0, $is_numeric = 0, $min_len = 0, $max_len = 0) {
+function antigate($filename, $apikey, $is_verbose = true, $rtimeout = 5, $mtimeout = 120, $is_russian = 0, $is_phrase = 0, $is_regsense = 0, $is_numeric = 0, $min_len = 0, $max_len = 0) {
     if (!file_exists($filename)) {
         if ($is_verbose)
             addlog("file $filename not found\n");
@@ -89,6 +89,7 @@ function antigate($filename, $apikey, $is_verbose = true, $rtimeout = 5, $mtimeo
         'key' => $apikey,
         'file' => '@' . $filename, // полный путь к файлу
         'phrase' => $is_phrase,
+        'is_russian' => $is_russian,
         'regsense' => $is_regsense,
         'numeric' => $is_numeric,
         'min_len' => $min_len,
@@ -111,7 +112,7 @@ function antigate($filename, $apikey, $is_verbose = true, $rtimeout = 5, $mtimeo
     if (strpos($result, "ERROR") !== false) {
         if (strpos($result, "ERROR_NO_SLOT_AVAILABLE") !== false) {
             sleep(5);
-            return antigate($filename, $apikey, $is_verbose, $rtimeout, $mtimeout, $is_phrase, $is_regsense, $is_numeric, $min_len, $max_len);
+            return antigate($filename, $apikey, $is_verbose, $rtimeout, $mtimeout, $is_russian, $is_phrase, $is_regsense, $is_numeric, $min_len, $max_len);
         } else {
             if ($is_verbose)
                 addlog("server returned error: $result\n");
@@ -131,7 +132,7 @@ function antigate($filename, $apikey, $is_verbose = true, $rtimeout = 5, $mtimeo
             if (strpos($result, 'ERROR') !== false) {
                 if (strpos($result, "ERROR_NO_SLOT_AVAILABLE") !== false) {
                     sleep(5);
-                    return antigate($filename, $apikey, $is_verbose, $rtimeout, $mtimeout, $is_phrase, $is_regsense, $is_numeric, $min_len, $max_len);
+                    return antigate($filename, $apikey, $is_verbose, $rtimeout, $mtimeout, $is_russian, $is_phrase, $is_regsense, $is_numeric, $min_len, $max_len);
                 } else {
                     if ($is_verbose)
                         addlog("server returned error: $result\n");
@@ -406,7 +407,6 @@ function YandexIndex($url, $stopping = 0) {
             $num = - 1;
         } else {
             if (strpos($sResp, "http://yandex.ru/captchaimg") !== false) {
-
                 addlog("============ <debug> ============\n");
                 file_put_contents(realpath(dirname(__FILE__).'/../').'/writing/captcha_page.html', $sResp);
                 preg_match('/<input[^>]+?(?:name="key"[^>]+?value="(.*)"|value="(.*)"[^>]+?name="key")>/U', $sResp, $cpmatches);
@@ -416,20 +416,22 @@ function YandexIndex($url, $stopping = 0) {
                 $fp = fopen($imgfile, "wb");
                 fwrite($fp, urlGetContents($imgmatches[1]));
                 fclose($fp);
-                //$key = capchabot("tmp/".$cpmatches[1].".gif");
-                $key = antigate($imgfile, $userconfig['antigate_key']);
-                $formUrl = "http://yandex.ru/checkcaptcha?key=".$cpmatches[1]."&retpath=".$pathmatches[1]."&rep=".urlencode($key);
-                addlog("\ncpmatches: ".$cpmatches[1]."\npathmatches: ".$pathmatches[1]."\nkey: $key\nResult Url: $formUrl\n\n============ </debug> ============\n\n");
+                $key = antigate($imgfile, $userconfig['antigate_key'], true, 5, 120, 1);
+                $formUrl = "http://yandex.ru/checkcaptcha?key=" . urlencode($cpmatches[1]) . "&retpath=" . urlencode(html_entity_decode($pathmatches[1])) . "&rep=" . urlencode($key);
+                addlog("\ncpmatches: " . $cpmatches[1] . "\npathmatches: " . $pathmatches[1] . "\nkey: $key\nResult Url: $formUrl\n\n============ </debug> ============\n\n");
                 $sResp = urlGetContents($formUrl);
                 @unlink($imgfile);
-
             }
 
-            preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}(?:ответ|страниц)~is', $sResp, $a);
+            preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis', $sResp, $a);
             $num = (int) @$a[1];
             if ($num == 0) {
-                preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}тыс\.(?:&nbsp;){1,3}(?:ответ|страниц)~is', $sResp, $a);
+                preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}тыс\.(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis', $sResp, $a);
                 $num = ((int) @$a[1]) * 1000;
+                if ($num == 0) {
+                    preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}млн(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis', $sResp, $a);
+                    $num = ((int) @$a[1]) * 1000000;
+                }
             }
 
             return $num;
