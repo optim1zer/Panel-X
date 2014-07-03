@@ -47,7 +47,7 @@ function sites_add(urls, dir, host, cms, registrator, comment, panel, checked) {
                 if(req.responseJS.answer=='0') alert("Такой сайт уже есть в панели");
                 if((req.responseJS.answer == 'captcha') || (req.responseJS.answer == 'needip')) {
                     if(req.responseJS.answer == 'captcha') alert('Яндекс посчитал нас ботом. Нужно переждать.');
-                    if(req.responseJS.answer == 'needip') alert('Зарегистрируйте на странице http://xml.yandex.ru/ip.xml IP-адрес для запросов: ' + req.responseJS.ip);
+                    if(req.responseJS.answer == 'needip') alert('Зарегистрируйте на странице http://xml.yandex.ru/ IP-адрес для запросов: ' + req.responseJS.ip);
                     $('#debugger').html('');
                 } else {
                     $('#debugger').html(req.responseJS.answer);
@@ -953,7 +953,7 @@ function settings_save() {
     proxies = $('#proxies').val();
     sites_per_query = $('#sites_per_query').val();
     time_between_checks = $('#time_between_checks').val();
-    
+
     $.fancybox.close();
     $('#debugger').html('<img src="images/loading_white.gif" alt="" border="0" style="vertical-align: middle;"> Сохранение настроек');
     window.current_request=$.ajax({
