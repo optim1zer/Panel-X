@@ -26,7 +26,7 @@ function urlPostContents($url, $post, $port = 80, $timeout = 40) {
     global $userconfig;
     $cUrl = new Curl_HTTP_Client(true);
     if (strpos($url, "yandex.ru") !== false OR strpos($url, "google.ru/search") !== false AND strpos($url, "xmlsearch.yandex.ru") === false) {
-        $cUrl->store_cookies("writing/yacookie.txt");
+        $cUrl->store_cookies(WRITING_PATH."yacookie.txt");
         if (strlen($userconfig['proxies'])) {
             $proxies = explode("\n", $userconfig['proxies']);
             $i = rand(0, count($proxies) - 1);
@@ -49,11 +49,11 @@ function urlPostContents($url, $post, $port = 80, $timeout = 40) {
 }
 
 //Отправка курлом post-методом
-function urlGetContents($url, $port = 80, $timeout = 40, $getcode = 0) {
+function urlGetContents($url, $port = 80, $timeout = 40, $getcode = 0, $referrer=null) {
     global $userconfig;
     $cUrl = new Curl_HTTP_Client(true);
     if (strpos($url, "yandex.ru") !== false OR strpos($url, "google.ru/search") !== false) {
-        $cUrl->store_cookies("writing/yacookie.txt");
+        $cUrl->store_cookies(WRITING_PATH."yacookie.txt");
         if (strlen($userconfig['proxies'])) {
             $proxies = explode("\n", $userconfig['proxies']);
             $i = rand(0, count($proxies) - 1);
@@ -68,8 +68,12 @@ function urlGetContents($url, $port = 80, $timeout = 40, $getcode = 0) {
             }
         }
     }
-    if ($port != 80)
+    if ($port != 80){
         $cUrl->set_port($port);
+    }
+    if(!empty($referrer)){
+        $cUrl->set_referrer($referrer);
+    }
     $cUrl->set_user_agent("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)");
     $content = ($getcode == 0) ? $cUrl->fetch_url($url, null, $timeout) : $cUrl->get_response_only($url);
     $cUrl->close();
@@ -402,38 +406,46 @@ function YandexIndex($url, $stopping = 0) {
             if ($i)
                 $addquery .= '.';
         }
+        $lastTime = filemtime(WRITING_PATH."yacookie.txt");
+        if(!$lastTime || $lastTime < time()-300){ // обновляем куки раз в 5 мин
+            $sResp = urlGetContents('http://www.yandex.ru/');
+        }
         $urlAddress = "http://yandex.ru/yandsearch?text=rhost%3A" . $addquery . ".*%20|%20rhost%3A" . $addquery . "&lr=225";
-        if (($sResp = urlGetContents($urlAddress)) === false) {
+        if (($sResp = urlGetContents($urlAddress, 80, 25, 0, 'http://yandex.ru')) === false) {
             $num = - 1;
         } else {
             if (strpos($sResp, "http://yandex.ru/captchaimg") !== false) {
                 addlog("============ <debug> ============\n");
-                file_put_contents(realpath(dirname(__FILE__).'/../').'/writing/captcha_page.html', $sResp);
+                file_put_contents(WRITING_PATH.'captcha_page.html', $sResp);
                 preg_match('/<input[^>]+?(?:name="key"[^>]+?value="(.*)"|value="(.*)"[^>]+?name="key")>/U', $sResp, $cpmatches);
                 preg_match('/<input[^>]+?(?:name="retpath"[^>]+?value="(.*)"|value="(.*)"[^>]+?name="retpath")>/U', $sResp, $pathmatches);
                 preg_match('/(?:src="(.*)"[^>]+?class="b-captcha__image"|class="b-captcha__image"[^>]+?src="(.*)")/U',$sResp,$imgmatches);
-                $imgfile = realpath(dirname(__FILE__).'/../').'/writing/'.gen_pass(32).'.gif';
+                $imgfile = WRITING_PATH.gen_pass(32).'.gif';
                 $fp = fopen($imgfile, "wb");
                 fwrite($fp, urlGetContents($imgmatches[1]));
                 fclose($fp);
                 $key = antigate($imgfile, $userconfig['antigate_key'], true, 5, 120, 1);
                 $formUrl = "http://yandex.ru/checkcaptcha?key=" . urlencode($cpmatches[1]) . "&retpath=" . urlencode(html_entity_decode($pathmatches[1])) . "&rep=" . urlencode($key);
                 addlog("\ncpmatches: " . $cpmatches[1] . "\npathmatches: " . $pathmatches[1] . "\nkey: $key\nResult Url: $formUrl\n\n============ </debug> ============\n\n");
-                $sResp = urlGetContents($formUrl);
+                $sResp = urlGetContents($formUrl, 80, 25, 0, $urlAddress);
                 @unlink($imgfile);
+
+                $num = 'captcha';
             }
 
-            preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis', $sResp, $a);
-            $num = (int) @$a[1];
-            if ($num == 0) {
-                preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}тыс\.(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis', $sResp, $a);
+            $pattern1 = '~(?:Нашлось|Нашёлся|Нашлась|Нашлись)(?:\s|&nbsp;|<br>|<br />){1,3}(\d+)(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis';
+            $pattern2 = '~(?:Нашлось|Нашёлся|Нашлась|Нашлись)(?:\s|&nbsp;|<br>|<br />){1,3}(\d+)(?:&nbsp;|\s){1,3}тыс\.(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis';
+            $pattern3 = '~(?:Нашлось|Нашёлся|Нашлась|Нашлись)(?:\s|&nbsp;|<br>|<br />){1,3}(\d+)(?:&nbsp;|\s){1,3}млн(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis';
+
+            if(preg_match($pattern1, $sResp, $a)){
+                $num = (int) @$a[1];
+            }
+            elseif(preg_match($pattern2, $sResp, $a)) {
                 $num = ((int) @$a[1]) * 1000;
-                if ($num == 0) {
-                    preg_match('~(?:<div class="input__found">)(?:\s|&nbsp;|&mdash;){1,3}(\d+)(?:&nbsp;|\s){1,3}млн(?:&nbsp;|\s){1,3}(?:ответ|страниц)~uis', $sResp, $a);
-                    $num = ((int) @$a[1]) * 1000000;
-                }
             }
-
+            elseif(preg_match($pattern3, $sResp, $a)) {
+                $num = ((int) @$a[1]) * 1000000;
+            }
             return $num;
         }
     }
@@ -625,7 +637,7 @@ function RamblerIndex($url) {
 
 //Получение статуса ответа сервера
 function serverStat($url) {
-    return urlGetContents($url, 80, 25, 1, 1);
+    return urlGetContents($url, 80, 25, 1);
 }
 
 //Проверка DMOZ
@@ -889,14 +901,14 @@ function printrfile($var) {
     print_r($var);
     $var = ob_get_contents();
     ob_end_clean();
-    $fp = fopen('writing/log.txt', 'w');
+    $fp = fopen(WRITING_PATH.'log.txt', 'w');
     fputs($fp, $var);
     fclose($fp);
 }
 
 //Проверяем файл с данными об апдейтах PR, ЯВ, тИЦ и парсим pr-cy
 function list_updates() {
-    $last = filemtime("writing/updates.txt");
+    $last = filemtime(WRITING_PATH."updates.txt");
     if (!$last || (( time() - $last ) > 86400)) {
         $upCY = $upPR = $upYAV = '&mdash;';
         $sResp = file_get_contents("http://pr-cy.ru/updates.xml");
@@ -908,24 +920,24 @@ function list_updates() {
         $content = '<b style="color:#646464;">PR</b>: <span class="count">'.$upPR.'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.
                   '<b style="color:#646464;">тИЦ</b>: <span class="count">'.$upCY.'</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.
                   '<b style="color:#646464;">ЯВ</b>: <span class="count">'.$upYAV.'</span>';
-        file_put_contents("writing/updates.txt", $content);
+        file_put_contents(WRITING_PATH."updates.txt", $content);
         return $content;
     }
-    return file_get_contents("writing/updates.txt");
+    return file_get_contents(WRITING_PATH."updates.txt");
 }
 
 //Проверяем наличие обновлений панели
 function panel_updates() {
-    $last = filemtime("writing/panel_update.txt");
+    $last = filemtime(WRITING_PATH."panel_update.txt");
     if (!$last || (( time() - $last ) > 86400)) {
         $sResp = urlGetContents("https://raw.githubusercontent.com/optim1zer/Panel-X/master/writing/panel_update.txt");
         if($sResp){
-            file_put_contents("writing/panel_update.txt", trim($sResp));
+            file_put_contents(WRITING_PATH."panel_update.txt", trim($sResp));
         }
     }
-    $ret = file_get_contents("writing/panel_update.txt");
+    $ret = file_get_contents(WRITING_PATH."panel_update.txt");
     $ret = trim($ret);
-    $ip = file_get_contents("writing/ip.txt");
+    $ip = file_get_contents(WRITING_PATH."ip.txt");
     if ($ret && $ret != PANEL_VERSION)
         $info = '<a href="https://github.com/optim1zer/Panel-X" target="_blank" style="color:red;">Доступно обновление панели</a>';
     else
@@ -1609,7 +1621,7 @@ function site_update($userconfig, $sid, $panel=1, $relcolumn="") {
 
 //Запись в лог
 function addlog($txt) {
-    $fp = fopen("writing/log.txt", "a");
+    $fp = fopen(WRITING_PATH."log.txt", "a");
     fwrite($fp, date("d/m/Y  H:i:s").'    '.$txt . "\n");
     fclose($fp);
 }

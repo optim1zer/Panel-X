@@ -4,12 +4,12 @@ include("include/config.php");
 include_once("include/mysql.php");
 
 $error = "";
-if(!is_writable("writing/ip.txt")) $error .=  "Выставьте права на запись для файла <b>writing/ip.txt</b><br>";
-if(!is_writable("writing/log.txt")) $error .=  "Выставьте права на запись для файла <b>writing/log.txt</b><br>";
-if(!is_writable("writing/panel_update.txt")) $error .=  "Выставьте права на запись для файла <b>writing/panel_update.txt</b><br>";
-if(!is_writable("writing/updates.txt")) $error .=  "Выставьте права на запись для файла <b>writing/updates.txt</b><br>";
-if(!is_writable("writing/yacookie.txt")) $error .=  "Выставьте права на запись для файла <b>writing/yacookie.txt</b><br>";
-if(!is_writable("writing/export.xls")) $error .=  "Выставьте права на запись для файла <b>writing/export.xls</b><br>";
+if(!is_writable(WRITING_PATH."ip.txt")) $error .=  "Выставьте права на запись для файла <b>writing/ip.txt</b><br>";
+if(!is_writable(WRITING_PATH."log.txt")) $error .=  "Выставьте права на запись для файла <b>writing/log.txt</b><br>";
+if(!is_writable(WRITING_PATH."panel_update.txt")) $error .=  "Выставьте права на запись для файла <b>writing/panel_update.txt</b><br>";
+if(!is_writable(WRITING_PATH."updates.txt")) $error .=  "Выставьте права на запись для файла <b>writing/updates.txt</b><br>";
+if(!is_writable(WRITING_PATH."yacookie.txt")) $error .=  "Выставьте права на запись для файла <b>writing/yacookie.txt</b><br>";
+if(!is_writable(WRITING_PATH."export.xls")) $error .=  "Выставьте права на запись для файла <b>writing/export.xls</b><br>";
 if(!is_writable("tmp")) $error .=  "Выставьте права на запись для папки <b>tmp</b><br>";
 
 if(!extension_loaded('curl')) $error .= "Установите расширение <b>CURL</b> для PHP для работы панели<br>";

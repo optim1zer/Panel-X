@@ -435,7 +435,7 @@ switch ($action) {
         echo "<table class=\"tablesorter\" id=\"tablesorter\" cellpadding=\"0\" cellspacing=\"0\"><thead><tr>" . $theader[0] . "</tr></thead><tbody id=\"tbodysites\">" . $main_request[0] . "</tbody></table><input type=\"hidden\" id=\"cur_page\" value=\"$pagenum\">";
         $buttons2 = bottom_buttons();
         $pupdate = panel_updates();
-        //$pupdate = 'v'.PANEL_VERSION.' (ip: '.file_get_contents("writing/ip.txt").')';
+        //$pupdate = 'v'.PANEL_VERSION.' (ip: '.file_get_contents(WRITING_PATH."ip.txt").')';
         $fixer = "<table class=\"tablesorter\" cellpadding=\"0\" cellspacing=\"0\"><thead><tr>" . $theader[1] . "<th style=\"background:#fff;border:0;\"><div><p style=\"width:35px;\"> </p></div></th></tr></thead></table>";
         $GLOBALS['_RESULT'] = array("buttons" => $buttons, "buttons2" => $buttons2, "pages" => $pages, "pupdate" => $pupdate, "fixer" => $fixer);
         break;
@@ -787,7 +787,7 @@ switch ($action) {
         echo ">Парсинг обычной выдачи</option></select></td></tr>
                     <tr class=\"yaxml\"";
         if($userconfig['yandex_method']=="XML") echo " style=\"display:table-row;\"";
-        echo "><td><b>Адрес для запросов к Я.XML</b>:<br><small>Получите, зарегистрировав IP <b>".file_get_contents("writing/ip.txt")."</b> на странице <a href=\"http://xml.yandex.ru/settings.xml\" target=\"_blank\" style=\"color:red;text-decoration:underline;\">Я.XML</a></small></td><td style=\"vertical-align:top\"><input type=\"text\" id=\"yandex_request\" value=\"".$userconfig['yandex_request']."\"  size=\"50\"></td></tr>
+        echo "><td><b>Адрес для запросов к Я.XML</b>:<br><small>Получите, зарегистрировав IP <b>".file_get_contents(WRITING_PATH."ip.txt")."</b> на странице <a href=\"http://xml.yandex.ru/settings.xml\" target=\"_blank\" style=\"color:red;text-decoration:underline;\">Я.XML</a></small></td><td style=\"vertical-align:top\"><input type=\"text\" id=\"yandex_request\" value=\"".$userconfig['yandex_request']."\"  size=\"50\"></td></tr>
             <tr class=\"yasimple\"";
         if($userconfig['yandex_method']=="SIMPLE") echo " style=\"display:table-row;\"";
         echo "><td><b>Ключ antigate.com</b>:<br><small>Позволяет избежать остановки парсинга из-за выдачи страницы Яндекса \"Вы - робот\"</small></td><td><input type=\"text\" id=\"antigate_key\" value=\"".$userconfig['antigate_key']."\" size=\"50\"></td></tr>
@@ -915,7 +915,7 @@ switch ($action) {
         $panel = $_REQUEST['panel'];
         include("include/excel.php");
 
-        $excel = new ExcelWriter("writing/export.xls");
+        $excel = new ExcelWriter(WRITING_PATH."export.xls");
 
         if ($excel == false)
             exit;
@@ -935,7 +935,7 @@ switch ($action) {
         header("Content-type: application/x-msexcel");
         header("Content-Disposition: attachment; filename=export.xls");
         header("Content-Description: PHP Generated XLS Data");
-        echo file_get_contents("writing/export.xls");
+        echo file_get_contents(WRITING_PATH."export.xls");
         break;
     //</editor-fold>
 // Подготовка плацдарма для графиков по статам сайта/ов

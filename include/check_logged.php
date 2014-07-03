@@ -92,11 +92,11 @@ function login() {
     }
 }
 
-if (filesize("writing/ip.txt") == 0 OR !file_exists("writing/ip.txt")) {
+if (filesize(WRITING_PATH."ip.txt") == 0 OR !file_exists(WRITING_PATH."ip.txt")) {
     $ipInfo = file_get_contents('http://ipinfo.io/json');
     $ipInfo = json_decode($ipInfo);
     if($ipInfo && $ipInfo->ip){
-        file_put_contents("writing/ip.txt", $ipInfo->ip);
+        file_put_contents(WRITING_PATH."ip.txt", $ipInfo->ip);
     }
 }
 login();
