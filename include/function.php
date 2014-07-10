@@ -351,14 +351,7 @@ function getFBurl($url) {
 function YandexIndex_XML($url) {
     global $userconfig;
     $num = - 1;
-    $url = preg_replace("/^www\./", "", $url);
-    $url_arr = explode(".", $url);
-    $addquery = "";
-    for ($i = count($url_arr) - 1; $i >= 0; $i--) {
-        $addquery .= $url_arr[$i];
-        if ($i)
-            $addquery .= '.';
-    }
+    $addquery = reverseUrl($url);
     if (strlen($addquery) > 0) {
         $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 . "<request>"
@@ -379,16 +372,11 @@ function YandexIndex_XML($url) {
     return $num;
 }
 
-function yaquery($url) {
+function reverseUrl($url) {
     $url = preg_replace("/^www\./", "", $url);
-    $url_arr = explode(".", $url);
-    $addquery = "";
-    for ($i = count($url_arr) - 1; $i >= 0; $i--) {
-        $addquery .= $url_arr[$i];
-        if ($i)
-            $addquery .= '.';
-    }
-    return $addquery;
+    $arr = explode(".", $url);
+    $arr = array_reverse($arr);
+    return implode('.', $arr);
 }
 
 // Я.Индекс основной
@@ -398,8 +386,8 @@ function YandexIndex($url, $stopping = 0) {
         return YandexIndex_XML($url);
     }
     if ($userconfig['yandex_method'] == "SIMPLE") {
-        $addquery = yaquery($url);
-        
+        $addquery = reverseUrl($url);
+
         $lastTime = filemtime(WRITING_PATH."yacookie.txt");
         if(!$lastTime || $lastTime < time()-300){ // обновляем куки раз в 5 мин
             $sResp = urlGetContents('http://www.yandex.ru/');
@@ -447,15 +435,15 @@ function YandexIndex($url, $stopping = 0) {
 
 //Генерация рандомного текста
 function gen_pass($m) {
-	$m = intval($m);
-	$pass = "";
-	for ($i = 0; $i < $m; $i++) {
-		$te = mt_rand(48, 122);
-		if (($te > 57 && $te < 65) || ($te > 90 && $te < 97))
-			$te = $te - 9;
-		$pass .= chr($te);
-	}
-	return $pass;
+    $m = intval($m);
+    $pass = "";
+    for ($i = 0; $i < $m; $i++) {
+        $te = mt_rand(48, 122);
+        if (($te > 57 && $te < 65) || ($te > 90 && $te < 97))
+            $te = $te - 9;
+        $pass .= chr($te);
+    }
+    return $pass;
 }
 
 //G.Индекс через Ajax API
@@ -675,8 +663,6 @@ function alexa_rank($url) {
 
 //Whois информация о домене
 function getWhoisData($domain) {
-    if (preg_match("/.ua$/", $domain))
-        return uaWhois($domain);
     if (preg_match("/.name$/", $domain))
         return nameWhois($domain);
     if (preg_match("/.livejournal.com$/", $domain))
@@ -717,47 +703,6 @@ function getWhoisData($domain) {
     }
     $registrar = substr($registrar, 0, $pos);
     $returnArr[] = $registrar;
-    return $returnArr;
-}
-
-//Whois информация о домене в зонах .ua
-function uaWhois($domain) {
-    if (preg_match("/.pp.ua$/", $domain)) {
-        $fp = fsockopen("whois.pp.ua", 43);
-        fputs($fp, "$domain\r\n");
-        $string = "";
-        while (!feof($fp)) {
-            $string.=fgets($fp, 128);
-        }
-        fclose($fp);
-        if (preg_match("/Expiration Date:(.*)\n/i", $string, $sp)) {
-            $returnArr[0] = "yes";
-            $date = strtotime($sp[1]);
-            $returnArr[2] = date("Y-m-d", $date);
-            preg_match("/Created On:(.*)\n/i", $string, $sp);
-            $date = strtotime($sp[1]);
-            $returnArr[1] = date("Y-m-d", $date);
-        } else {
-            $returnArr[0] = "no";
-        }
-    } else {
-        $fp = fsockopen("whois.net.ua", 43);
-        fputs($fp, "$domain\r\n");
-        $string = "";
-        while (!feof($fp)) {
-            $string.=fgets($fp, 128);
-        }
-        fclose($fp);
-        if (preg_match("/status:(.*) OK-UNTIL ([\d]{14})\n/i", $string, $sp)) {
-            $returnArr[0] = "yes";
-            $returnArr[2] = substr($sp[2], 0, 4) . "-" . substr($sp[2], 4, 2) . "-" . substr($sp[2], 6, 2);
-            $string = preg_replace("/% Domain Record:(.*)% Administrative Contact:/is", "", $string);
-            preg_match("/changed:(.*)(\d{14})\n/i", $string, $sp);
-            $returnArr[1] = substr($sp[2], 0, 4) . "-" . substr($sp[2], 4, 2) . "-" . substr($sp[2], 6, 2);
-        } else {
-            $returnArr[0] = "no";
-        }
-    }
     return $returnArr;
 }
 
@@ -887,7 +832,7 @@ function printrfile($var) {
 //Проверяем файл с данными об апдейтах PR, ЯВ, тИЦ и парсим pr-cy
 function list_updates() {
     $last = filemtime(WRITING_PATH."updates.txt");
-    if (!$last || (( time() - $last ) > 86400) || filesize("writing/updates.txt") == 0) {
+    if (!$last || (( time() - $last ) > 86400) || filesize(WRITING_PATH."updates.txt") == 0) {
         $upCY = $upPR = $upYAV = '&mdash;';
         $sResp = file_get_contents("http://pr-cy.ru/updates.xml");
         if($updates = new SimpleXMLElement($sResp)){
@@ -1242,7 +1187,7 @@ function gen_site_rows($userconfig, $sid=0, $pagenum=1, $panel=1) {
                     $value = "<a href=\"" . str_replace(array("[url]", "[ip]"), array($row['url'], $row['site_ip']), $col_titles[$cols[$i]][2]) . "\" target=\"_blank\" class=\"linet\" rel=\"http://counter.yadro.ru/logo;" . $row['url'] . "?29.1\">" . $val . "</a>"; else
                     $value = (in_array($cols[$i], $cols_links)) ? "<a href=\"" . str_replace(array("[url]", "[ip]"), array($row['url'], $row['site_ip']), $col_titles[$cols[$i]][2]) . "\" target=\"_blank\">" . $val . "</a>" : $val;
                 if ($cols[$i] == "yai")
-                    $value = "<a href=\"" . str_replace("[yaurl]", yaquery($row['url']), $col_titles[$cols[$i]][2]) . "\" target=\"_blank\">" . $val . "</a>";
+                    $value = "<a href=\"" . str_replace("[yaurl]", reverseUrl($row['url']), $col_titles[$cols[$i]][2]) . "\" target=\"_blank\">" . $val . "</a>";
                 $addrow = "<td>$value</td>";
                 if (in_array($cols[$i], $birzha))
                     $addrow = "<td id=\"" . $cols[$i] . "_" . $row['id'] . "\" onclick=\"javascript: change('" . $row['id'] . "', '" . $cols[$i] . "')\">" . str_replace(array("0", "1"), array("<img class=\"inact\" src=\"images/spacer.gif\" alt=\"Нет\" title=\"Нет\">", "<img src=\"images/spacer.gif\" alt=\"Есть\" title=\"Есть\" class=\"act\">"), $val) . "</td>";
@@ -1538,7 +1483,7 @@ function site_update($userconfig, $sid, $panel=1, $relcolumn="") {
         }
         $db->sql_query("INSERT INTO " . $prefix . "history (sid, thedate, pr, tcy, yai, gi, yi, ri, ybl, alexarank, feedcount, li_hits, li_hosts) VALUES ('$sid', '" . time() . "', '" . $updater['pr'] . "', '" . $updater['tcy'] . "', '" . $updater['yai'] . "', '" . $updater['gi'] . "', '" . $updater['yi'] . "', '" . $updater['ri'] . "', '" . $updater['ybl'] . "', '" . $updater['alexarank'] . "', '" . $updater['feedcount'] . "', '" . $updater['li_hits'] . "', '" . $updater['li_hosts'] . "')");
         list($lhid) = $db->sql_fetchrow($db->sql_query("SELECT id FROM " . $prefix . "history WHERE sid='$sid' ORDER BY id DESC LIMIT 1,1"));
-//		$db->sql_query("UPDATE ".$prefix."sites SET lhid='".$lhid."' WHERE id='$sid'");
+//        $db->sql_query("UPDATE ".$prefix."sites SET lhid='".$lhid."' WHERE id='$sid'");
 
         $db->sql_query("UPDATE " . $prefix . "sites SET lhid='" . $lhid . "', last_check='" . time() . "', ip='" . gethostbyname($url) . "'" . $sql . " WHERE id='$sid'");
     } else {

@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -35,41 +35,20 @@ class pl_handler
 	function parse($data_str, $query)
 		{
 		$items = array(
-                	'created:' 				=> 'domain.created',
-                	'last modified'			=> 'domain.changed',
-                	'REGISTRAR:'			=> 'domain.sponsor',
-                	"registrant's handle:"	=> 'owner.handle',
-                	
+                	'domain.created' => 'created:',
+                	'domain.changed' => 'last modified:',
+                	'domain.sponsor' => 'REGISTRAR:',
+                	'#' => 'WHOIS displays data with a delay not exceeding 15 minutes in relation to the .pl Registry system'
+
 					);
 
-		$r['regrinfo'] = generic_parser_b($data_str['rawdata'], $items, 'ymd');			
-
-		if ($r['regrinfo']['registered'] == 'yes')
-			{
-			$found = false;
-			
-			foreach($data_str['rawdata'] as $line)
-				{
-				if ($found)
-					{
-					if (strpos($line,':')) break;
-					$r['regrinfo']['domain']['nserver'][] = $line;
-					}
-	
-				if (strpos($line,'nameservers:') !== false)
-					{
-					$found = true;
-					$r['regrinfo']['domain']['nserver'][] = substr($line,13);
-					}
-				}
-			}
+		$r['regrinfo'] = easy_parser($data_str['rawdata'], $items, 'ymd');
 
 		$r['regyinfo'] = array(
 			'referrer' => 'http://www.dns.pl/english/index.html',
 			'registrar' => 'NASK'
 			);
-
-		return ($r);
+		return $r;
 		}
 	}
 ?>

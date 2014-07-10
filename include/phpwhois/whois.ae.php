@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -25,9 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* uaenic.whois 1.00    Liron Newman <ln-phpwhois@eesh.net> */
-/* Based upon atnic.whois  2.00    David Saez <david@ols.es> */
-
 if (!defined('__AE_HANDLER__'))
 	define('__AE_HANDLER__', 1);
 
@@ -35,43 +32,27 @@ require_once('whois.parser.php');
 
 class ae_handler
 	{
-
 	function parse($data_str, $query)
 		{
+		$items = array(
+                    'Domain Name:'		=> 'domain.name',
+                    'Registrar Name:'	=> 'domain.sponsor',
+                    'Status:'			=> 'domain.status',
+                    'Registrant Contact ID:'	=> 'owner.handle',
+                    'Registrant Contact Name:' => 'owner.name',
+                    'Tech Contact Name:'		=> 'tech.name',
+                    'Tech Contact ID:'			=> 'tech.handle',
+                    'Name Server:'		=> 'domain.nserver.'
+		              );
 
-		$translate = array(
-			'fax-no' 		=> 'fax',
-			'e-mail' 		=> 'email',
-			'nic-hdl' 		=> 'handle',
-			'person' 		=> 'name'
-			);
-
-		$contacts = array(
-                    'owner-c' => 'owner',
-                    'admin-c' => 'admin',
-                    'tech-c' => 'tech',
-                    'billing-c' => 'billing',
-                    'zone-c' => 'zone'
-		                );
+		$r['regrinfo'] = generic_parser_b($data_str['rawdata'], $items, 'ymd');
 
 		$r['regyinfo'] = array(
                     'referrer' => 'http://www.nic.ae',
                     'registrar' => 'UAENIC'
                     );
 
-		$reg = generic_parser_a($data_str['rawdata'], $translate, $contacts, 'domain', 'Ymd');
-
-		if (isset($reg['domain']['remarks']))
-			unset($reg['domain']['remarks']);
-
-		if (isset($reg['domain']['descr']))
-			{
-			$reg['owner'] = get_contact($reg['domain']['descr']);
-			unset($reg['domain']['descr']);			
-			}
-
-		$r['regrinfo'] = $reg;
-		return ($r);
+		return $r;
 		}
 	}
 ?>

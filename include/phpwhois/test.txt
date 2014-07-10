@@ -9,9 +9,11 @@ br		registro.br
 ca		cira.ca
 ch		creart.ch blaueskreuz.ch
 cn		china.cn
+co		nic.co
 cz		nic.cz
 de		4ever.de ks2-hanau.de
 fi		ficora.fi
+fj		usp.ac.fj
 fm		dot.fm
 fr		nic.fr lemonade.fr
 hu		nic.hu
@@ -19,9 +21,11 @@ ie		domainregistry.ie
 in		registry.in
 is		isnic.is
 it		nic.it
+jp		google.co.jp jprs.jp
 li		nic.li
 lt      domreg.lt
 lu		dns.lu
+ly		nic.ly
 mx		nic.mx
 nl		domain-registry.nl
 nu		nunames.nu
@@ -29,7 +33,7 @@ nz		dnc.org.nz
 pl		nic.pl
 pt		dns.pt
 ru		nic.ru
-sc		admin.sc
+sc		nic.sc
 se		nic-se.se
 si		arnes.si
 su		news.su
@@ -48,19 +52,25 @@ corenic		corenic.com
 directnic	directnic.com
 domainbank	domainbank.com
 domaincontender domaincontender.com
-domaindiscover  buydomains.com
+afternic	buydomains.com
+domainpeople	domainpeople.com
 dotster		dotster.com namesdirect.com dotregistrar.com
-encirca		nic.jobs
+dreamhost	dreamhost.com
+encirca		encirca.com
 enom		enom.com
 fabulous	fabulous.com
+fastdomain	fastdomain.com
+gandi		gandi.net
 godaddy		godaddy.com
 iana		example.com
 interdomain	interdominio.com
 joker		joker.com
-melbourneit     inww.com
+markmonitor	markmonitor.com
+melbourneit	inww.com
 moniker		moniker.com
 namejuice	namejuice.com
 nameking	nameking.com
+names4ever	names4ever.com
 networksolutions		networksolutions.com
 nicco		nicco.com
 nicline		nicline.com
@@ -78,6 +88,7 @@ namevault	namevault.com
 tmagnic     antiquea.com
 tvcorp		www.tv
 wwdomains	wildwestdomains.com
+corporatedomains	cscglobal.com
 
 // Other
 
@@ -107,13 +118,12 @@ apnic		218.165.121.114
 arin		207.217.120.54
 arin+rwhois	70.84.47.210
 arin+whois	63.95.254.3
-bripw		200.165.206.74
 krnic		210.178.148.129
 lacnic		200.44.33.31
-ripe		62.97.102.115
+lacnic(br)	200.165.206.74
+ripe		62.97.102.115 151.99.187.181 2001:630:d0:f111:203:93ff:fed1:f454
 
 // ASN
 
 arin		AS220
-
-
+krnic		AS9700

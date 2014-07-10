@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -25,15 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* uknic.whois	1.2	David Saez Padros <david@ols.es> */
-/*                      Fixed detection of non-existant domains */
-/* uknic.whois  1.3     8/1/2002 Added status (active/inactive/detagged) */
-/*                      and corrected error for detagged domains */
-/*                      (like blue.co.uk) thanx to Adam Greedus */
-/* uknic.whois  1.4     16/10/2002 Updated for new Nominet whois output */
-/*                      also updated for common object model */
-/* uknic.whois  1.5     03/03/2003 minor fixes */
-
 if (!defined('__UK_HANDLER__'))
 	define('__UK_HANDLER__', 1);
 
@@ -41,20 +32,21 @@ require_once('whois.parser.php');
 
 class uk_handler
 	{
-
 	function parse($data_str, $query)
 		{
-
 		$items = array(
                 'owner.organization' => 'Registrant:',
-                'owner.address' => "Registrant's address:",
+                'owner.address'  => "Registrant's address:",
+                'owner.type' 	 => 'Registrant type:',
                 'domain.created' => 'Registered on:',
  				'domain.changed' => 'Last updated:',
                 'domain.expires' => 'Renewal date:',
                 'domain.nserver' => 'Name servers:',
                 'domain.sponsor' => 'Registrar:',
                 'domain.status'	 => 'Registration status:',
-                '' => 'WHOIS lookup made at'
+                'domain.dnssec'	 => 'DNSSEC:',
+                '' 				 => 'WHOIS lookup made at',
+                'disclaimer'	 => '--',
 		        );
 
 		$r['regrinfo'] = get_blocks($data_str['rawdata'], $items);
@@ -63,22 +55,18 @@ class uk_handler
 			{
 			$r['regrinfo']['owner']['organization'] = $r['regrinfo']['owner']['organization'][0];
 			$r['regrinfo']['domain']['sponsor'] = $r['regrinfo']['domain']['sponsor'][0];
-
-			//unset($r['regrinfo']['domain']['nserver'][count($r['regrinfo']['domain']['nserver']) - 1]);
 			$r['regrinfo']['registered'] = 'yes';
-			
+
 			$r = format_dates($r, 'dmy');
 			}
 		else
 			$r['regrinfo']['registered'] = 'no';
-			
+
 		$r['regyinfo'] = array(
-                    'referrer' => 'http://www.monimet.uk',
+                    'referrer' => 'http://www.nominet.org.uk',
                     'registrar' => 'Nominet UK'
-		                );					
+		                );
 		return $r;
 		}
-
 	}
-
 ?>

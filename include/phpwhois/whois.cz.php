@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -32,10 +32,8 @@ require_once('whois.parser.php');
 
 class cz_handler
 	{
-
 	function parse($data_str, $query)
 		{
-
 		$translate = array(
                       'expire' 	=> 'expires',
                       'registered' => 'created',
@@ -46,7 +44,7 @@ class cz_handler
                       'descr'	=> 'desc',
                       'e-mail'	=> 'email',
                       'person'	=> 'name',
-                      'role'	=> 'organization',
+                      'org'		=> 'organization',
                       'fax-no'	=> 'fax'
 		                  );
 
@@ -57,14 +55,19 @@ class cz_handler
                       'registrant' => 'owner'
 		                  );
 
+		$r['regrinfo'] = generic_parser_a($data_str['rawdata'], $translate, $contacts, 'domain', 'dmy');
+
 		$r['regyinfo'] = array(
                           'referrer' => 'http://www.nic.cz',
                           'registrar' => 'CZ-NIC'
                           );
 
-		$reg = generic_parser_a($data_str['rawdata'], $translate, $contacts, 'domain', 'dmy');
-		$r['regrinfo'] = $reg;
-		return ($r);
+		if ($data_str['rawdata'][0] == 'Your connection limit exceeded. Please slow down and try again later.')
+			{
+			$r['regrinfo']['registered'] = 'unknown';
+			}
+
+		return $r;
 		}
 	}
 ?>

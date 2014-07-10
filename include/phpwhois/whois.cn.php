@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -25,9 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* lunic.whois  2.0	David Saez <david@ols.es> 2003/09/08 */
-/* cnnic.whois	1.0	Chewy - 2003/Sep/03 */
-
 if (!defined('__CN_HANDLER__'))
 	define('__CN_HANDLER__', 1);
 
@@ -35,12 +32,12 @@ require_once('whois.parser.php');
 
 class cn_handler
 	{
-
 	function parse($data_str, $query)
 		{
 		$items = array(
                 'Domain Name:' => 'domain.name',
-                'Domain Status:' => 'domain.status',
+                'Domain Status:' => 'domain.status.',
+                'ROID:' => 'domain.handle',
                 'Name Server:' => 'domain.nserver.',
                 'Registration Date:' => 'domain.created',
                 'Expiration Date:' => 'domain.expires',
@@ -83,13 +80,12 @@ class cn_handler
                 'Billing Fax:' => 'billing.fax'
 		            );
 
+		$r['regrinfo'] = generic_parser_b($data_str['rawdata'], $items, 'ymd');
 		$r['regyinfo'] = array(
                 'referrer' => 'http://www.cnnic.net.cn',
                 'registrar' => 'China NIC'
                 );
-		$r['regrinfo'] = generic_parser_b($data_str['rawdata'], $items, 'ymd');
-		return ($r);
+		return $r;
 		}
 	}
-
 ?>

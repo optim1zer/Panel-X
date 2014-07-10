@@ -5,7 +5,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -31,21 +31,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 $lines = file('./test.txt');
 $domains = array();
 
-foreach ($lines as $key => $line)
-	{ 
+foreach ($lines as $line)
+	{
 	$pos = strpos($line,'/');
-	
+
 	if ($pos !== false) $line = substr($line,0,$pos);
-	
+
 	$line = trim($line);
-	
-	if ($line=='') continue;
-	
+
+	if ($line == '') continue;
+
 	$parts = explode(' ',str_replace("\t",' ',$line));
-	
-	for ($i=1;$i<count($parts);$i++)	
-		if ($parts[$i]!='')
-			$domains[] = $parts[$i];
+	$key = $parts[0];
+
+	for ($i=1; $i<count($parts); $i++)
+		if ($parts[$i] != '')
+			{
+			if ($key)
+				{
+				$domains[$key] = $parts[$i];
+				$key = false;
+				}
+			else
+				$domains[] = $parts[$i];
+			}
 	}
 
 // Load previous results
@@ -60,6 +69,13 @@ else
 	fclose($fp);
 	}
 
+// Specific test ?
+
+if (!empty($argv[1]) && isset($domains[$argv[1]]))
+	{
+	$domains = array($domains[$argv[1]]);
+	}
+
 // Test domains
 
 include('whois.main.php');
@@ -68,18 +84,18 @@ $whois = new Whois();
 
 set_file_buffer(STDIN, 0);
 
-foreach ($domains as $key => $domain)
+foreach ($domains as $domain)
 	{
 	echo "\nTesting $domain ---------------------------------\n";
 	$result = $whois->Lookup($domain);
-	
+
 	unset($result['rawdata']);
-	
+
 	if (!isset($results[$domain]))
 		{
 		print_r($result);
 		$res = get_answer("Add result for $domain");
-		
+
 		if ($res)
 			{
 			// Add as it is
@@ -87,30 +103,35 @@ foreach ($domains as $key => $domain)
 			$results[$domain] = $result;
 			save_results();
 			}
-		
+
 		}
 	else
 		{
 		// Compare with previous result
 		unset($result['regrinfo']['disclaimer']);
 		unset($results[$domain]['regrinfo']['disclaimer']);
-		
-		$diff = array_diff_assoc_recursive($result,$results[$domain]);
-		
-		if (is_array($diff))
-			{
-			print_r($diff);
-			$res = get_answer("Accept differences for $domain");
-		
-			if ($res)
-				{
-				// Add as it is
-				$results[$domain] = $result;
-				save_results();
-				}
-			}
+
+		if (empty($result))
+			echo "!! empty result\n";
 		else
-			echo "Handler for domain $domain gives same results as before ...\n";
+			{
+			$diff = array_diff_assoc_recursive($result,$results[$domain]);
+
+			if (is_array($diff))
+				{
+				print_r($diff);
+				$res = get_answer("Accept differences for $domain");
+
+				if ($res)
+					{
+					// Add as it is
+					$results[$domain] = $result;
+					save_results();
+					}
+				}
+			else
+				echo "Handler for domain $domain gives same results as before ...\n";
+			}
 		}
 	}
 
@@ -136,14 +157,14 @@ echo "\n------ $question ? (y/n/a/c) ";
 while (true)
 	{
 	$res = trim(fgetc(STDIN));
-		
+
 	if ($res=='a') exit();
 
 	if ($res=='c')
 		{
 		save_results();
 		exit();
-		}	
+		}
 	if ($res=='y') return true;
 	if ($res=='n') return false;
 	}
@@ -161,14 +182,14 @@ foreach($array1 as $key => $value)
 			{
 			$difference[$key] = array( 'previous' => $array2[$key], 'actual' => $value);
 			}
-		else 
+		else
 			{
 			$new_diff = array_diff_assoc_recursive($value, $array2[$key]);
-			
+
 			if ($new_diff != false)
 				{
 				$difference[$key] = $new_diff;
-				} 
+				}
 			}
 		}
 	else
@@ -177,7 +198,7 @@ foreach($array1 as $key => $value)
 			$difference[$key] = array( 'previous' => $array2[$key], 'actual' => $value);
 			}
 	}
-	
+
 // Search missing items
 
 foreach($array2 as $key => $value)
@@ -185,7 +206,7 @@ foreach($array2 as $key => $value)
 	if (!isset($array1[$key]))
 		$difference[$key] = array( 'previous' => $value, 'actual' => '(missing)');
 	}
-	
+
 return !isset($difference) ? false : $difference;
 }
 

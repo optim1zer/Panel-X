@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -32,10 +32,8 @@ require_once('whois.parser.php');
 
 class ie_handler
 	{
-
 	function parse($data_str, $query)
 		{
-
 		$translate = array(
 			'nic-hdl' => 'handle',
 			'person' => 'name',
@@ -47,11 +45,6 @@ class ie_handler
                     'tech-c' => 'tech',
 		                );
 
-		$r['regyinfo'] = array(
-                    'referrer' => 'http://www.domainregistry.ie',
-                    'registrar' => 'IE Domain Registry'
-                    );
-
 		$reg = generic_parser_a($data_str['rawdata'], $translate, $contacts, 'domain', 'Ymd');
 
 		if (isset($reg['domain']['descr']))
@@ -61,7 +54,11 @@ class ie_handler
 			}
 
 		$r['regrinfo'] = $reg;
-		return ($r);
+		$r['regyinfo'] = array(
+                    'referrer' => 'http://www.domainregistry.ie',
+                    'registrar' => 'IE Domain Registry'
+                    );
+		return $r;
 		}
 	}
 ?>

@@ -5,7 +5,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 include('whois.main.php');
 
 if (isset($argv[1]))
-	$domain=$argv[1];
+	$domain = $argv[1];
 else
 	$domain = 'example.com';
 

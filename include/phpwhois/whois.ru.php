@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -25,8 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* runic.whois	1.0	Vadim Smelyansky <vadim@vadiaz.com> 2007/01/25 */
-
 if (!defined('__RU_HANDLER__'))
 	define('__RU_HANDLER__', 1);
 
@@ -34,7 +32,6 @@ require_once('whois.parser.php');
 
 class ru_handler
 	{
-
 	function parse($data_str, $query)
 		{
 		$items = array(
@@ -53,13 +50,14 @@ class ru_handler
 
 		$r['regrinfo'] = generic_parser_b($data_str['rawdata'], $items, 'dmy');
 
+		if (empty($r['regrinfo']['domain']['status']))
+			$r['regrinfo']['registered'] = 'no';
+
 		$r['regyinfo'] = array(
                             'referrer' => 'http://www.ripn.net',
                             'registrar' => 'RUCENTER-REG-RIPN'
                           );
-
-		return ($r);
+		return $r;
 		}
 	}
-
 ?>

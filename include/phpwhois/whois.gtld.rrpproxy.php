@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -32,16 +32,15 @@ require_once('whois.parser.php');
 
 class rrpproxy_handler
 	{
-
 	function parse($data_str, $query)
 		{
-
 		$items = array(
                   'created-date:' => 'domain.created',
                   'updated-date:' => 'domain.changed',
                   'registration-expiration-date:' => 'domain.expires',
                   'RSP:' => 'domain.sponsor',
-                  'owner-contact:' => 'owner.handle',
+                  'URL:' => 'domain.referrer',
+                  'owner-nom.contact:' => 'owner.handle',
                   'owner-fname:' => 'owner.name.first',
                   'owner-lname:' => 'owner.name.last',
                   'owner-organization:' => 'owner.organization',
@@ -52,7 +51,7 @@ class rrpproxy_handler
                   'owner-phone:' => 'owner.phone',
                   'owner-fax:' => 'owner.fax',
                   'owner-email:' => 'owner.email',
-                  'admin-contact:' => 'admin.handle',
+                  'admin-nom.contact:' => 'admin.handle',
                   'admin-fname:' => 'admin.name.first',
                   'admin-lname:' => 'admin.name.last',
                   'admin-organization:' => 'admin.organization',
@@ -63,7 +62,7 @@ class rrpproxy_handler
                   'admin-phone:' => 'admin.phone',
                   'admin-fax:' => 'admin.fax',
                   'admin-email:' => 'admin.email',
-                  'tech-contact:' => 'tech.handle',
+                  'tech-nom.contact:' => 'tech.handle',
                   'tech-fname:' => 'tech.name.first',
                   'tech-lname:' => 'tech.name.last',
                   'tech-organization:' => 'tech.organization',
@@ -74,21 +73,20 @@ class rrpproxy_handler
                   'tech-phone:' => 'tech.phone',
                   'tech-fax:' => 'tech.fax',
                   'tech-email:' => 'tech.email',
-                  'billing-contact:' => 'bill.handle',
-                  'billing-fname:' => 'bill.name.first',
-                  'billing-lname:' => 'bill.name.last',
-                  'billing-organization:' => 'bill.organization',
-                  'billing-street:' => 'bill.address.street',
-                  'billing-city:' => 'bill.address.city',
-                  'billing-zip:' => 'bill.address.pcode',
-                  'billing-country:' => 'bill.address.country',
-                  'billing-phone:' => 'bill.phone',
-                  'billing-fax:' => 'bill.fax',
-                  'billing-email:' => 'bill.email'
+                  'billing-nom.contact:' => 'billing.handle',
+                  'billing-fname:' => 'billing.name.first',
+                  'billing-lname:' => 'billing.name.last',
+                  'billing-organization:' => 'billing.organization',
+                  'billing-street:' => 'billing.address.street',
+                  'billing-city:' => 'billing.address.city',
+                  'billing-zip:' => 'billing.address.pcode',
+                  'billing-country:' => 'billing.address.country',
+                  'billing-phone:' => 'billing.phone',
+                  'billing-fax:' => 'billing.fax',
+                  'billing-email:' => 'billing.email'
 		              );
 
-		$r = generic_parser_b($data_str, $items);
-		return ($r);
+		return generic_parser_b($data_str, $items);
 		}
 	}
 ?>

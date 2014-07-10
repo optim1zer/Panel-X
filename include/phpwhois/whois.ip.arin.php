@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -25,7 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* arin.whois	1.0 	David Saez 7/6/2002 */
 
 if (!defined('__ARIN_HANDLER__'))
 	define('__ARIN_HANDLER__', 1);
@@ -34,14 +33,13 @@ require_once('whois.parser.php');
 
 class arin_handler
 	{
-
 	function parse($data_str, $query)
 		{
 		$items = array(
                   'OrgName:' 	=> 'owner.organization',
                   'CustName:' 	=> 'owner.organization',
-                  'OrgID:' 		=> 'owner.handle',
-                  'Address:' 	=> 'owner.address.street',
+                  'OrgId:' 		=> 'owner.handle',
+                  'Address:' 	=> 'owner.address.street.',
                   'City:' 		=> 'owner.address.city',
                   'StateProv:' 	=> 'owner.address.state',
                   'PostalCode:' => 'owner.address.pcode',
@@ -54,7 +52,7 @@ class arin_handler
                   'Comment:' 	=> 'network.desc.',
                   'RegDate:' 	=> 'network.created',
                   'Updated:' 	=> 'network.changed',
-                  'ASHandle:' 	=> 'AS.handle',
+                  'ASHandle:' 	=> 'network.handle',
                   'ASName:' 	=> 'network.name',
                   'NetHandle:' 	=> 'network.handle',
                   'NetName:' 	=> 'network.name',
@@ -70,20 +68,11 @@ class arin_handler
 		              );
 
 		$r = generic_parser_b($data_str, $items, 'ymd', false, true);
-		
-		if (isset($r['AS']))
-			{
-			$ash = $r['AS']['handle'];
-			$r['AS'] = $r['network'];
-			$r['AS']['handle'] = $ash;
-			unset($r['network']);			
-			}
-		
-		if (isset($r['abuse']['email'])) 
+
+		if (@isset($r['abuse']['email']))
 		    $r['abuse']['email'] = implode(',',$r['abuse']['email']);
 
-		return $r;
+		return array( 'regrinfo' => $r );
 		}
-
 	}
 ?>

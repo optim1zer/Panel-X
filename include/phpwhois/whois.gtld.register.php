@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -25,9 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* registercom.whois	1.0	mark jeftovic	1999/12/26 */
-/* registercom.whois    2.1     david@ols.es    2003/02/18 */
-
 if (!defined('__REGISTER_HANDLER__'))
 	define('__REGISTER_HANDLER__', 1);
 
@@ -47,7 +44,9 @@ class register_handler
                   'zone' => 'Zone',
                   'domain.sponsor#0' => 'Registrar Name....:',
                   'domain.sponsor#1' => 'Registration Service Provided By:',
+                  'domain.referrer'	=> 'Registrar Homepage:',
                   'domain.nserver' => 'Domain servers in listed order:',
+                  'domain.nserver' => 'DNS Servers:',
                   'domain.name' => 'Domain name:',
                   'domain.created#0' => 'Created on..............:',
                   'domain.created#1' => 'Creation date:',

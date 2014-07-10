@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -25,7 +25,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* 
+/*
 BUG
 - nserver -> array
 - ContactID in address
@@ -38,10 +38,8 @@ require_once('whois.parser.php');
 
 class it_handler
 	{
-
 	function parse($data_str, $query)
 		{
-
 		$items = array(
 			'domain.name' =>	'Domain:',
 			'domain.nserver' =>	'Nameservers',
@@ -58,14 +56,15 @@ class it_handler
 			'contactid:'	=> 'handle',
 			'organization:' => 'organization',
 			'created:'		=> 'created',
-			'last update:' 	=> 'changed'
+			'last update:' 	=> 'changed',
+			'web:'			=> 'web'
 		            );
 
 		$r['regrinfo'] = easy_parser($data_str['rawdata'], $items, 'ymd',$extra);
-			
+
 		if (isset($r['regrinfo']['registrar']))
 			{
-			$r['domain']['registrar'] = $r['regrinfo']['registrar'][0];
+			$r['regrinfo']['domain']['registrar'] = $r['regrinfo']['registrar'];
 			unset($r['regrinfo']['registrar']);
 			}
 
@@ -73,8 +72,7 @@ class it_handler
                   'registrar' => 'IT-Nic',
                   'referrer' => 'http://www.nic.it/'
                   );
-
-		return ($r);
+		return $r;
 		}
 	}
 ?>

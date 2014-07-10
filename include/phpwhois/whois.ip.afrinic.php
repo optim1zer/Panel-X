@@ -4,7 +4,7 @@ Whois.php        PHP classes to conduct whois queries
 
 Copyright (C)1999,2005 easyDNS Technologies Inc. & Mark Jeftovic
 
-Maintained by David Saez (david@ols.es)
+Maintained by David Saez
 
 For the most recent version of this package visit:
 
@@ -25,8 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* ripe.whois	1.0 	David Saez 7/6/2002 */
-
 require_once('whois.parser.php');
 
 if (!defined('__AFRINIC_HANDLER__'))
@@ -34,7 +32,6 @@ if (!defined('__AFRINIC_HANDLER__'))
 
 class afrinic_handler
 	{
-
 	function parse($data_str, $query)
 		{
 		$translate = array(
@@ -43,7 +40,6 @@ class afrinic_handler
                       'nic-hdl' => 'handle',
                       'person' => 'name',
                       'netname' => 'name',
-                      'descr' => 'desc',
                       'organisation' => 'handle',
                       'org-name' => 'organization',
                       'org-type' => 'type'
@@ -57,17 +53,25 @@ class afrinic_handler
 
 		$r = generic_parser_a($data_str, $translate, $contacts, 'network', 'Ymd');
 
+		if (isset($r['network']['descr']))
+			{
+			$r['owner']['organization'] = $r['network']['descr'];
+			unset($r['network']['descr']);
+			}
+
 		if (isset($r['owner']['remarks']) && is_array($r['owner']['remarks']))
 			while (list($key, $val) = each($r['owner']['remarks']))
-				{ 
+				{
 				$pos = strpos($val,'rwhois://');
-			
+
 				if ($pos!==false)
 					$r['rwhois'] = strtok(substr($val,$pos),' ');
 				}
-		
+
+		$r = array( 'regrinfo' => $r );
+		$r['regyinfo']['type'] = 'ip';
+		$r['regyinfo']['registrar'] = 'African Network Information Center';
 		return $r;
 		}
-
 	}
 ?>

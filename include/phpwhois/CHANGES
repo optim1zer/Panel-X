@@ -1,3 +1,122 @@
+2011/07/09
+		- html & cosmetic changes in examples
+		- released version 4.2.2
+
+2011/07/08
+		- fixes for arin (bug #3339783)
+		- fixed .nl handler (bug #3314404)
+		- fixed .ae whois server (bug #3354286)
+		- fixed bug #3333558
+		- .uk handler improvement (partial patch #3314417)
+		- added support for .gt domains (request #3353926)
+		- cosmetic fixes to many handlers (removed unuseful
+		  spaces, removed change history, regyinfo position
+		  unification,...)
+		- cira.ca,nicline are non UTF8
+
+2011/06/26
+		- added handler for gandi (request #3155752)
+		- added handler for .cl
+		- corrected utf-8 support for .hu, .br and ripe
+		- fixes for .pl, .org.za, .be, .cz, .de, .fj, .it, .ch
+		  handlers
+		- nameservers are automatically searched if missing
+
+2011/06/24
+		- fixed .be handler (bug #3307363)
+		- fixed ip.lacnic handler array handling
+		- fixed .eu hanlder (bug #3297823)
+		- fixed .ae handler (bug #3181964)
+		- fixed .uk handler (partial patch # 3314417)
+		- fixed .ru handler (bug #3178123)
+		- added handler for .ir
+
+2011/01/26
+		- fixed .se handler (bug #3165639)
+
+2011/01/24
+		- fixed .pe server (bug #3164251)
+
+2011/01/17
+		- fixed .co handler (bug #3159317)
+		- fixed .ca handler (bug #3141475)
+
+2010/12/06
+		- fixed .ca handler
+
+2010/12/03
+		- fixed .pl handler
+
+2010/11/29
+		- fixed .de handler
+
+2010/11/22
+		- added handler for corporatedomains (Kyle Brost)
+
+2010/11/05
+		- added support for .ke domains
+
+2010/09/20
+		- released version 4.2.1
+		- provided default object data for unsupported domains
+
+2010/09/16
+		- fixed .si handler
+
+2010/08/26
+		- UseServer can now be used for ip addresses
+
+2010/08/24
+		- removed dangerous exec call
+
+2010/08/23
+		- improved extra whois parameters for better
+		support of .jp whois
+		- added handler for .jp
+		- added handler for .co
+		- added ipv6 support
+
+2010/08/10
+		- joined common whois field list
+		- some minor fixes
+		- testsuite can now test specific handlers
+		- fixed iana handler
+		- improved generic_parser_b
+		- removed .es handler
+
+2010/07/27
+		- better AS support
+		- ip handlers rewritten
+
+2010/07/21
+		- added dnssec info to domain object
+		- parser improved
+		- better support for some non utf-8 servers
+		- removed buydomains handler
+		- added afternic handler
+		- fixes for many handlers
+
+2010/07/20
+		- fixed arin new query format
+		- better ip refferal whois follow-up
+		- avoid double rwhois queries
+
+2010/05/20
+		- added gtld handlers for domainpeople,dremhost,fastdomain,
+		  marmonitor & names4ever (by Brandon Whaley)
+
+2010/04/28
+		- fixed gtld handler: some registrars give no information
+          on pendingdelete domains that could appear as unregistered
+		- fixed bug #2991358 (owner not correctly set for .at domains)
+		- fixed bug #2991270 (added extra incorrect nameserver
+          on .eu domains)
+        - fixed bug #2991265 (.org organization not parsed)
+
+2010/04/13
+		- added .ly handler
+		- added .fj handler
+
 2009/12/29
 		- released version 4.2.0
 		- added handler for .tel
@@ -12,7 +131,7 @@
 		- fixes for html nice output and utf-8 support
 
 2008/10/10
-		- fixed Bugs item #2153003
+		- fixed bug #2153003
 		- fixed bug #2153380 Bad info for joker.com domain owners
 
 2008/09/07
